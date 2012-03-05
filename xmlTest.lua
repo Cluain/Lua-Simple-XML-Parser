@@ -18,6 +18,13 @@ testXml = testXml .. '</testThree>'
 testXml = testXml .. '<test_Four something="else">'
 testXml = testXml .. 'testFourValue'
 testXml = testXml .. '</test_Four>'
+testXml = testXml .. '<testFive>'
+testXml = testXml .. '<testFiveDeep>'
+testXml = testXml .. '<testFiveEvenDeeper>'
+testXml = testXml .. '<testSix someParam="someValue"/>'
+testXml = testXml .. '</testFiveEvenDeeper>'
+testXml = testXml .. '</testFiveDeep>'
+testXml = testXml .. '</testFive>'
 testXml = testXml .. 'testTwoValue'
 testXml = testXml .. '</testTwo>'
 testXml = testXml .. '</testOne>'
@@ -41,6 +48,10 @@ if parsedXml.testOne.testTwo.testThree[1]:value() ~= "testThreeValue" then error
 if parsedXml.testOne.testTwo.testThree[2]:value() ~= "testThreeValueTwo" then error("Second of duplicate nodes value not set") end
 if parsedXml.testOne.testTwo.testThree[2]["@duplicate"][1] ~= "one" then error("First of duplicate parameters not set") end
 if parsedXml.testOne.testTwo.testThree[2]["@duplicate"][2] ~= "two" then error("Second of duplicate parameters not set") end
+
+-- deep element test
+
+if parsedXml.testOne.testTwo.testFive.testFiveDeep.testFiveEvenDeeper.testSix['@someParam'] ~= "someValue" then error("Deep test error") end
    
 -- node functions test
 local node = require("xml").newNode("testName")

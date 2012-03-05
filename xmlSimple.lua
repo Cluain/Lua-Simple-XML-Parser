@@ -3,15 +3,16 @@ module(..., package.seeall)
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 --
--- xmlSimple.lua - easy to use XML parser for parsing simple XML
+-- xml.lua - XML parser for use with the Corona SDK.
 --
--- version: 1.0
+-- version: 1.2
 --
 -- CHANGELOG:
 --
+-- 1.2 - Created new structure for returned table
+-- 1.1 - Fixed base directory issue with the loadFile() function.
 --
--- NOTE: This is a modified version of Corona-XML-Module created by Jonathan Beebe
--- which in turn is a modified version of Alexander Makeev's Lua-only XML parser
+-- NOTE: This is a modified version of Alexander Makeev's Lua-only XML parser
 -- found here: http://lua-users.org/wiki/LuaXml
 --
 ---------------------------------------------------------------------------------
@@ -77,6 +78,7 @@ function newParser()
                 local lNode = newNode(label)
                 self:ParseArgs(lNode, xarg)
                 table.insert(stack, lNode)
+		top = lNode
             else -- end tag
                 local toclose = table.remove(stack) -- remove top
 
