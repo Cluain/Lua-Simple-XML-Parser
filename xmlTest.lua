@@ -5,7 +5,7 @@
 -- Time: 7:40 PM
 --
 
-local xml = require("xml").newParser()
+local xml = require("xmlSimple").newParser()
 
 local testXml = '<testOne param="param1value">'
 testXml = testXml .. '<testTwo paramTwo="param2value">'
@@ -54,7 +54,7 @@ if parsedXml.testOne.testTwo.testThree[2]["@duplicate"][2] ~= "two" then error("
 if parsedXml.testOne.testTwo.testFive.testFiveDeep.testFiveEvenDeeper.testSix['@someParam'] ~= "someValue" then error("Deep test error") end
    
 -- node functions test
-local node = require("xml").newNode("testName")
+local node = require("xmlSimple").newNode("testName")
 
 if node:name() ~= "testName" then error("Node creation failed") end
 
@@ -64,7 +64,7 @@ if node:name() ~= "nameTest" then error("Name function test failed") end
 node:setValue("valueTest")
 if node:value() ~= "valueTest" then error("Value function test failed") end
 
-local childNode = require("xml").newNode("parent")
+local childNode = require("xmlSimple").newNode("parent")
 
 node:addChild(childNode)
 
