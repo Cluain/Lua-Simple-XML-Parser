@@ -145,7 +145,7 @@ function newNode(name)
         else
             self[child:name()] = child
         end
-        table.insert(self.___children, self[child:name()])
+        table.insert(self.___children, child)
     end
 
     function node:properties() return self.___props end
