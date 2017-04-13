@@ -84,10 +84,10 @@ function newParser()
 
                 top = stack[#stack]
                 if #stack < 1 then
-                    error("XmlParser: nothing to close with " .. label)
+                    return nil,"XmlParser: nothing to close with " .. label
                 end
                 if toclose:name() ~= label then
-                    error("XmlParser: trying to close " .. toclose.name .. " with " .. label)
+                    return nil,"XmlParser: trying to close " .. toclose.name .. " with " .. label
                 end
                 top:addChild(toclose)
             end
@@ -95,7 +95,7 @@ function newParser()
         end
         local text = string.sub(xmlText, i);
         if #stack > 1 then
-            error("XmlParser: unclosed " .. stack[#stack]:name())
+            return nil,"XmlParser: unclosed " .. stack[#stack]:name()
         end
         return top
     end
