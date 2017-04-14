@@ -32,15 +32,52 @@ function newParser()
             end);
         return value;
     end
-
+    
     function XmlParser:FromXmlString(value)
+        local utf8bits = { {0x7FF,{192,32},{128,64}}, {0xFFFF,{224,16},{128,64},{128,64}}, {0x1FFFFF,{240,8},{128,64},{128,64},{128,64}} }
         value = string.gsub(value, "&#x([%x]+)%;",
             function(h)
-                return string.char(tonumber(h, 16))
+                if (tonumber(h, 16)<=127) then
+                    return string.char(tonumber(h, 16))
+                else
+                    h=tonumber(h, 16)
+                    local charbytes = {}
+                    for b,lim in ipairs(utf8bits) do
+                        if h<=lim[1] then
+                            for i=b+1,2,-1 do
+                                local prefix,max = lim[i+1][1],lim[i+1][2]
+                                local mod = h % max
+                                charbytes[i] = string.char( prefix + mod )
+                                h = ( h - mod ) / max
+                            end
+                            charbytes[1] = string.char( h + lim[2][1] )
+                            break
+                        end
+                    end
+                    return table.concat(charbytes)
+                end
             end);
         value = string.gsub(value, "&#([0-9]+)%;",
             function(h)
-                return string.char(tonumber(h, 10))
+                if (tonumber(h, 10)<=127) then
+                    return string.char(tonumber(h, 10))
+                else
+                    h=tonumber(h, 10)
+                    local charbytes = {}
+                    for b,lim in ipairs(utf8bits) do
+                        if h<=lim[1] then
+                            for i=b+1,2,-1 do
+                                local prefix,max = lim[i+1][1],lim[i+1][2]
+                                local mod = h % max
+                                charbytes[i] = string.char( prefix + mod )
+                                h = ( h - mod ) / max
+                            end
+                            charbytes[1] = string.char( h + lim[2][1] )
+                            break
+                        end
+                    end
+                    return table.concat(charbytes)
+                end
             end);
         value = string.gsub(value, "&quot;", "\"");
         value = string.gsub(value, "&apos;", "'");
@@ -78,7 +115,7 @@ function newParser()
                 local lNode = newNode(label)
                 self:ParseArgs(lNode, xarg)
                 table.insert(stack, lNode)
-		top = lNode
+        top = lNode
             else -- end tag
                 local toclose = table.remove(stack) -- remove top
 
