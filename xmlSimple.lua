@@ -199,7 +199,7 @@ function newNode(name)
         else
             self[lName] = value
         end
-        table.insert(self.___props, { name = name, value = self[name] })
+        table.insert(self.___props, { name = name, value = self[lName] })
     end
 
     return node
