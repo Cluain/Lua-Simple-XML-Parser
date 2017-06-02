@@ -1,82 +1,65 @@
----
--- User: krystian
--- Company: Cluain Krystian Szczęsny
--- Date: 12/21/11
--- Time: 7:40 PM
---
-
 local xml = require("xmlSimple").newParser()
-
-local testXml = '<testOne param="param1value">'
-testXml = testXml .. '<testTwo paramTwo="param2value">'
-testXml = testXml .. '<testThree>'
-testXml = testXml .. 'testThreeValue'
-testXml = testXml .. '</testThree>'
-testXml = testXml .. '<testThree duplicate="one" duplicate="two">'
-testXml = testXml .. 'testThreeValueTwo'
-testXml = testXml .. '</testThree>'
-testXml = testXml .. '<test_Four something="else">'
-testXml = testXml .. 'testFourValue'
-testXml = testXml .. '</test_Four>'
-testXml = testXml .. '<testFive>'
-testXml = testXml .. '<testFiveDeep>'
-testXml = testXml .. '<testFiveEvenDeeper>'
-testXml = testXml .. '<testSix someParam="someValue"/>'
-testXml = testXml .. '</testFiveEvenDeeper>'
-testXml = testXml .. '</testFiveDeep>'
-testXml = testXml .. '</testFive>'
-testXml = testXml .. 'testTwoValue'
-testXml = testXml .. '</testTwo>'
-testXml = testXml .. '</testOne>'
-
-
-local parsedXml = xml:ParseXmlText(testXml)
-
-
-if parsedXml.testOne == nil then error("Node not created") end
-if parsedXml.testOne:name() ~= "testOne" then error("Node name not set") end
-if parsedXml.testOne.testTwo == nil then error("Child node not created") end
-if parsedXml.testOne.testTwo:name() ~= "testTwo" then error("Child node name not set") end
-if parsedXml.testOne.testTwo:value() ~= "testTwoValue" then error("Node value not set") end
-if parsedXml.testOne.testTwo.test_Four:value() ~= "testFourValue" then error("Second child node value not set") end
-if parsedXml.testOne["@param"] ~= "param1value" then error("Parameter not set") end
-if parsedXml.testOne.testTwo["@paramTwo"] ~= "param2value" then error("Second child node parameter not set") end
-if parsedXml.testOne.testTwo.test_Four["@something"] ~= "else" then error("Deepest node parameter not set") end
-
--- duplicate names tests
-if parsedXml.testOne.testTwo.testThree[1]:value() ~= "testThreeValue" then error("First of duplicate nodes value not set") end
-if parsedXml.testOne.testTwo.testThree[2]:value() ~= "testThreeValueTwo" then error("Second of duplicate nodes value not set") end
-if parsedXml.testOne.testTwo.testThree[2]["@duplicate"][1] ~= "one" then error("First of duplicate parameters not set") end
-if parsedXml.testOne.testTwo.testThree[2]["@duplicate"][2] ~= "two" then error("Second of duplicate parameters not set") end
-
--- deep element test
-
-if parsedXml.testOne.testTwo.testFive.testFiveDeep.testFiveEvenDeeper.testSix['@someParam'] ~= "someValue" then error("Deep test error") end
-   
--- node functions test
-local node = require("xmlSimple").newNode("testName")
-
-if node:name() ~= "testName" then error("Node creation failed") end
-
-node:setName("nameTest")
-if node:name() ~= "nameTest" then error("Name function test failed") end
-
-node:setValue("valueTest")
-if node:value() ~= "valueTest" then error("Value function test failed") end
-
-local childNode = require("xmlSimple").newNode("parent")
-
-node:addChild(childNode)
-
-if type(node:children()) ~= "table" then error("children function test failed") end
-if #node:children() ~= 1 then error("AddChild function test failed") end
-if node:numChildren() ~= 1 then error("numChildren function test failed") end
-
-
-node:addProperty("name", "value")
-
-if type(node:properties()) ~= "table" then error("properties function test failed") end
-if #node:properties() ~= 1 then error("Add property function test failed") end
-if node:numProperties() ~= 1 then error("Num properties function test failed") end
-
-print("Tests passed")
+local testXml = io.open('/home/a/Desktop/Lua-Simple-XML-Parser-master/files/utf8.xml'):read('*all')
+local parsedXml,err = xml:ParseXmlText(testXml)
+function print_r ( t )  
+    local print_r_cache={}
+    local function sub_print_r(t,indent)
+        if (print_r_cache[tostring(t)]) then
+            print(indent.."*"..tostring(t))
+        else
+            print_r_cache[tostring(t)]=true
+            if (type(t)=="table") then
+                for pos,val in pairs(t) do
+                    if (type(val)=="table") then
+                        print(indent.."["..pos.."] => "..tostring(t).." {")
+                        sub_print_r(val,indent..string.rep(" ",string.len(pos)+8))
+                        print(indent..string.rep(" ",string.len(pos)+6).."}")
+                    elseif (type(val)=="string") then
+                        print(indent.."["..pos..'] => "'..val..'"')
+                    else
+                        print(indent.."["..pos.."] => "..tostring(val))
+                    end
+                end
+            else
+                print(indent..tostring(t))
+            end
+        end
+    end
+    if (type(t)=="table") then
+        print(tostring(t).." {")
+        sub_print_r(t,"  ")
+        print("}")
+    else
+        sub_print_r(t,"  ")
+    end
+    print()
+end
+function n(num)
+	local str=""
+	for i=0,num,1 do
+		str=str.."-----"
+	end
+	return str
+end
+function p(var,num)
+	if var==nil then		
+		print(n(num),"nil")
+	else
+		if type(var)=="table" then
+			for k,v in pairs(var) do
+				print(n(num),k)
+				num=num+1
+				p(v,num)
+				num=num-1
+			end
+		else
+			print(n(num),k)
+		end
+	end
+end
+if parsedXml~=nil and err==nil then
+print_r(parsedXml)
+--p(parsedXml,0)
+else
+print(err)
+end
