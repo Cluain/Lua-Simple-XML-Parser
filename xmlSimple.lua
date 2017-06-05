@@ -21,17 +21,17 @@ function newParser()
 
     XmlParser = {};
 
-    function XmlParser:ToXmlString(value)
-        value = string.gsub(value, "&", "&amp;"); -- '&' -> "&amp;"
-        value = string.gsub(value, "<", "&lt;"); -- '<' -> "&lt;"
-        value = string.gsub(value, ">", "&gt;"); -- '>' -> "&gt;"
-        value = string.gsub(value, "\"", "&quot;"); -- '"' -> "&quot;"
-        value = string.gsub(value, "([^%w%&%;%p%\t% ])",
-            function(c)
-                return string.format("&#x%X;", string.byte(c))
-            end);
-        return value;
-    end
+    -- function XmlParser:ToXmlString(value)
+        -- value = string.gsub(value, "&", "&amp;"); -- '&' -> "&amp;"
+        -- value = string.gsub(value, "<", "&lt;"); -- '<' -> "&lt;"
+        -- value = string.gsub(value, ">", "&gt;"); -- '>' -> "&gt;"
+        -- value = string.gsub(value, "\"", "&quot;"); -- '"' -> "&quot;"
+        -- value = string.gsub(value, "([^%w%&%;%p%\t% ])",
+            -- function(c)
+                -- return string.format("&#x%X;", string.byte(c))
+            -- end);
+        -- return value;
+    -- end
     
     function XmlParser:FromXmlString(value)
         local utf8bits = { {0x7FF,{192,32},{128,64}}, {0xFFFF,{224,16},{128,64},{128,64}}, {0x1FFFFF,{240,8},{128,64},{128,64},{128,64}} }
@@ -164,7 +164,8 @@ function newNode(name)
     node.___name = name
     node.___children = {}
     node.___props = {}
-
+	node.___data = {}
+	
     function node:value() return self.___value end
     function node:setValue(val) self.___value = val end
     function node:name() return self.___name end
@@ -172,15 +173,15 @@ function newNode(name)
     function node:children() return self.___children end
     function node:numChildren() return #self.___children end
     function node:addChild(child)
-        if self[child:name()] ~= nil then
-            if type(self[child:name()].name) == "function" then
+        if self.___data[child:name()] ~= nil then
+            if type(self.___data[child:name()].name) == "function" then
                 local tempTable = {}
-                table.insert(tempTable, self[child:name()])
-                self[child:name()] = tempTable
+                table.insert(tempTable, self.___data[child:name()])
+                self.___data[child:name()] = tempTable
             end
-            table.insert(self[child:name()], child)
+            table.insert(self.___data[child:name()], child)
         else
-            self[child:name()] = child
+            self.___data[child:name()] = child
         end
         table.insert(self.___children, child)
     end
@@ -189,17 +190,17 @@ function newNode(name)
     function node:numProperties() return #self.___props end
     function node:addProperty(name, value)
         local lName = "@" .. name
-        if self[lName] ~= nil then
-            if type(self[lName]) == "string" then
+        if self.___data[lName] ~= nil then
+            if type(self.___data[lName]) == "string" then
                 local tempTable = {}
-                table.insert(tempTable, self[lName])
-                self[lName] = tempTable
+                table.insert(tempTable, self.___data[lName])
+                self.___data[lName] = tempTable
             end
-            table.insert(self[lName], value)
+            table.insert(self.___data[lName], value)
         else
-            self[lName] = value
+            self.___data[lName] = value
         end
-        table.insert(self.___props, { name = name, value = self[lName] })
+        table.insert(self.___props, { name = name, value = self.___data[lName] })
     end
 
     return node
