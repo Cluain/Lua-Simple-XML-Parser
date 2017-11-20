@@ -157,12 +157,68 @@ function newNode(name)
                 local tempTable = {}
                 table.insert(tempTable, self[lName])
                 self[lName] = tempTable
+		XmlText(xmlText), nil;
+        else
+            print(err)
+            return nil
+        end
+    end
+
+    return XmlParser
+end
+
+function newNode(name)
+    local node = {}
+    node.___value = nil
+    node.___name = name
+    node.___children = {}
+    node.___props = {}
+
+    function node:value() return self.___value end
+    function node:setValue(val) self.___value = val end
+    function node:name() return self.___name end
+    function node:setName(name) self.___name = name end
+    function node:children() return self.___children end
+    function node:numChildren() return #self.___children end
+    function node:addChild(child)
+        if self[child:name()] ~= nil then
+            if type(self[child:name()].name) == "function" then
+                local tempTable = {}
+                table.insert(tempTable, self[child:name()])
+                self[child:name()] = tempTable
+            end
+            table.insert(self[child:name()], child)
+        else
+            self[child:name()] = child
+        end
+        table.insert(self.___children, child)
+    end
+
+    function node:properties() return self.___props end
+    function node:numProperties() return #self.___props end
+    function node:addProperty(name, value)
+        local lName = "@" .. name
+        if self[lName] ~= nil then
+            if type(self[lName]) == "string" then
+                local tempTable = {}
+                table.insert(tempTable, self[lName])
+                self[lName] = tempTable
+		-- Fix ___props now that it's a table not a string
+		for _, attr in ipairs(self.___props) do
+		    if attr.name == name then
+			attr.value = self[lName]
+			break
+		    end
+		end
             end
             table.insert(self[lName], value)
+	    self.___props[name] = self[lName]
+	    print ("\nXMLParser (Warn): An attribute name must not appear more than once in the same start-tag or empty-element tag.\nXMLParser (Warn): Element => "..self.___name.."; Attribute Name => "..name)
         else
             self[lName] = value
+	    table.insert(self.___props, {naame = name, value = self[lName] })
+	    self.____props[name] = value
         end
-        table.insert(self.___props, { name = name, value = self[name] })
     end
 
     return node
