@@ -14,8 +14,8 @@ NOTE: This is a modified version of Alexander Makeev's Lua-only XML parser
 found here: http://lua-users.org/wiki/LuaXml
 
 --]]
-xmlSimple = {}
-function xmlSimple:newParser()
+xml = {}
+function xml:newParser()
 
     XmlParser = {};
 
@@ -56,7 +56,7 @@ function xmlSimple:newParser()
 
     function XmlParser:ParseXmlText(xmlText)
         local stack = {}
-        local top = xmlSimple:newNode()
+        local top = xml:newNode()
         table.insert(stack, top)
         local ni, c, label, xarg, empty
         local i, j = 1, 1
@@ -72,11 +72,11 @@ function xmlSimple:newParser()
                 stack[#stack]:setValue(lVal)
             end
             if empty == "/" then -- empty element tag
-                local lNode = xmlSimple:newNode(label)
+                local lNode = xml:newNode(label)
                 self:ParseArgs(lNode, xarg)
                 top:addChild(lNode)
             elseif c == "" then -- start tag
-                local lNode = xmlSimple:newNode(label)
+                local lNode = xml:newNode(label)
                 self:ParseArgs(lNode, xarg)
                 table.insert(stack, lNode)
 		top = lNode
@@ -119,7 +119,7 @@ function xmlSimple:newParser()
     return XmlParser
 end
 
-function xmlSimple:newNode(name)
+function xml:newNode(name)
     local node = {}
     node.___value = nil
     node.___name = name
@@ -190,4 +190,4 @@ function xmlSimple:newNode(name)
     return node
 end
 
-return xmlSimple
+return xml

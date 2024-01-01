@@ -1,5 +1,5 @@
 #!/usr/bin/env lua
-local xml = require("xmlSimple").newParser()
+local xml = require("xml").newParser()
 local testXml = '<testOne param="param1value">'
 testXml = testXml .. '<testTwo paramTwo="param2value">'
 testXml = testXml .. '<testThree>'
@@ -58,7 +58,7 @@ if parsedXml.testOne.testTwo.testFive.testFiveDeep.testFiveEvenDeeper.testSix['@
 end
 
 -- node functions test
-local node = require("xmlSimple"):newNode("testName")
+local node = require("xml"):newNode("testName")
 if node:name() ~= "testName" then
 	error("Node creation failed")
 end
@@ -70,7 +70,7 @@ node:setValue("valueTest")
 if node:value() ~= "valueTest" then
 	error("Value function test failed")
 end
-local childNode = require("xmlSimple"):newNode("parent")
+local childNode = require("xml"):newNode("parent")
 node:addChild(childNode)
 if type(node:children()) ~= "table" then
 	error("children function test failed")
